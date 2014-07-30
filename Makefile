@@ -153,7 +153,7 @@ else ifeq ($(UNAME), Darwin)
 endif
 
 ifeq ($(LINUX), 1)
-	CXX := /usr/bin/g++
+	CXX := /opt/gcc/4.6.4/bin/g++
 endif
 
 # OS X:
