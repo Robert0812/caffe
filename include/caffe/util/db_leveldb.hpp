@@ -56,9 +56,15 @@ class LevelDB : public DB {
       db_ = NULL;
     }
   }
-  virtual LevelDBCursor* NewCursor() {
-    return new LevelDBCursor(db_->NewIterator(leveldb::ReadOptions()));
+  virtual LevelDBCursor* NewCursor(DataParameter::CURSOR_TYPE type){
+    if (type == DataParameter_CURSOR_TYPE_ORDINARY)
+      return new LevelDBCursor(db_->NewIterator(leveldb::ReadOptions()));
+    else {
+      NOT_IMPLEMENTED;
+      return NULL;
+    }
   }
+ 
   virtual LevelDBTransaction* NewTransaction() {
     return new LevelDBTransaction(db_);
   }
