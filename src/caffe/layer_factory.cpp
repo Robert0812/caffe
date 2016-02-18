@@ -17,6 +17,7 @@
 #include "caffe/proto/caffe.pb.h"
 
 #ifdef USE_CUDNN
+#include "caffe/util/cudnn.hpp"
 #include "caffe/layers/cudnn_conv_layer.hpp"
 #include "caffe/layers/cudnn_lcn_layer.hpp"
 #include "caffe/layers/cudnn_lrn_layer.hpp"
@@ -25,6 +26,7 @@
 #include "caffe/layers/cudnn_sigmoid_layer.hpp"
 #include "caffe/layers/cudnn_softmax_layer.hpp"
 #include "caffe/layers/cudnn_tanh_layer.hpp"
+#include "caffe/layers/cudnn_bn_layer.hpp"
 #endif
 
 #ifdef WITH_PYTHON_LAYER
@@ -228,6 +230,46 @@ shared_ptr<Layer<Dtype> > GetTanHLayer(const LayerParameter& param) {
 }
 
 REGISTER_LAYER_CREATOR(TanH, GetTanHLayer);
+
+// Get bn layer according to engine.
+template <typename Dtype>
+shared_ptr<Layer<Dtype> > GetBNLayer(const LayerParameter& param) {
+  BNParameter_Engine engine = param.bn_param().engine();
+  if (engine == BNParameter_Engine_DEFAULT) {
+    engine = BNParameter_Engine_CAFFE;
+#if defined(USE_CUDNN)
+#if CUDNN_VERSION_MIN(4, 0, 0)
+    engine = BNParameter_Engine_CUDNN;
+#endif
+#endif
+  }
+#if defined(USE_CUDNN)
+#if CUDNN_VERSION_MIN(4, 0, 0)
+  if (engine == BNParameter_Engine_CUDNN && param.bn_param().frozen()) {
+    LOG(WARNING) << "Layer " << param.name() << " switches back to CAFFE engine"
+                 << " as CUDNN engine doesn't support frozen.";
+    engine = BNParameter_Engine_CAFFE;
+  }
+#endif
+#endif
+  if (engine == BNParameter_Engine_CAFFE) {
+    LOG(INFO) << "Layer " << param.name() << " is using CAFFE engine.";
+    return shared_ptr<Layer<Dtype> >(new BNLayer<Dtype>(param));
+  } 
+#if defined(USE_CUDNN)
+#if CUDNN_VERSION_MIN(4, 0, 0)
+  else if (engine == BNParameter_Engine_CUDNN) {
+    LOG(INFO) << "Layer " << param.name() << " is using CUDNN engine.";
+    return shared_ptr<Layer<Dtype> >(new CuDNNBNLayer<Dtype>(param));
+  } 
+#endif
+#endif
+  else {
+    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+  }
+}
+
+REGISTER_LAYER_CREATOR(BN, GetBNLayer);
 
 #ifdef WITH_PYTHON_LAYER
 template <typename Dtype>
