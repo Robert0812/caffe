@@ -486,18 +486,9 @@ message ArgMaxParameter {
 message BNParameter {
   optional FillerParameter slope_filler = 1;
   optional FillerParameter bias_filler = 2;
-  optional float momentum = 3 [default = 0.9];
-  optional float eps = 4 [default = 1e-5];
-  // If true, will use the moving average mean and std for training and test.
-  // Will override the lr_param and freeze all the parameters.
-  // Make sure to initialize the layer properly with pretrained parameters.
-  optional bool frozen = 5 [default = false];
-  enum Engine {
-    DEFAULT = 0;
-    CAFFE = 1;
-    CUDNN = 2;
-  }
-  optional Engine engine = 6 [default = DEFAULT];
+  optional bool moving_average = 3 [default = true];
+  optional float momentum = 4 [default = 0.9];
+  optional float eps = 5 [default = 1e-7];
 }
 
 message ConcatParameter {

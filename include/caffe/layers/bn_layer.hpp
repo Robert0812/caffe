@@ -43,7 +43,7 @@ class BNLayer : public Layer<Dtype> {
   void AverageAllExceptChannel(const Dtype* input, Dtype* output);
   void BroadcastChannel(const Dtype* input, Dtype* output);
 
-  bool frozen_;
+  bool moving_average_;
   Dtype bn_momentum_;
   Dtype bn_eps_;
 
@@ -57,7 +57,7 @@ class BNLayer : public Layer<Dtype> {
   Blob<Dtype> batch_statistic_;
 
   Blob<Dtype> x_norm_;
-  Blob<Dtype> x_inv_std_;
+  Blob<Dtype> x_std_;
 
   Blob<Dtype> spatial_sum_multiplier_;
   Blob<Dtype> batch_sum_multiplier_;
