@@ -17,6 +17,7 @@
 #include "caffe/proto/caffe.pb.h"
 
 #ifdef USE_CUDNN
+#include "caffe/util/cudnn.hpp"
 #include "caffe/layers/cudnn_conv_layer.hpp"
 #include "caffe/layers/cudnn_lcn_layer.hpp"
 #include "caffe/layers/cudnn_lrn_layer.hpp"
@@ -25,6 +26,7 @@
 #include "caffe/layers/cudnn_sigmoid_layer.hpp"
 #include "caffe/layers/cudnn_softmax_layer.hpp"
 #include "caffe/layers/cudnn_tanh_layer.hpp"
+#include "caffe/layers/cudnn_bn_layer.hpp"
 #endif
 
 #ifdef WITH_PYTHON_LAYER
